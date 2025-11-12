@@ -7,7 +7,7 @@ public static class ServiceCollectionExtensions
         {
             options.AddPolicy("AllowFrontend", policy =>
             {
-                policy.WithOrigins("http://localhost:5173", "https://sribhojan.netlify.app")
+                policy.WithOrigins("http://localhost:5173", "https://hrimsf.netlify.app")
                       .AllowAnyHeader()
                       .AllowAnyMethod();
             });
