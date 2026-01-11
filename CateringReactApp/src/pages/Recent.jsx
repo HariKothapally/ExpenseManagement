@@ -1,28 +1,12 @@
-import React, { useState } from 'react';
-import { useQuery, useQueryClient } from 'react-query';
-import {
-  Box,
-  Typography,
-  Paper,
-  IconButton,
-  CircularProgress,
-  Button,
-  Card,
-  CardContent,
-  Alert,
-  Grid,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle
-} from '@mui/material';
-import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
-import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { api } from '../services/api';
-import ExpenseEditDialog from '../components/ExpenseEditDialog';
-import toast from 'react-hot-toast';
+import React, { useState } from "react";
+import { useQuery, useQueryClient } from "react-query";
+import { ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { ArrowRightIcon } from "@heroicons/react/24/outline";
+import { PencilIcon } from "@heroicons/react/24/outline";
+import { TrashIcon } from "@heroicons/react/24/outline";
+import { api } from "../services/api";
+import ExpenseEditDialog from "../components/ExpenseEditDialog";
+import toast from "react-hot-toast";
 
 const Recent = () => {
   const queryClient = useQueryClient();
@@ -31,8 +15,12 @@ const Recent = () => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState(null);
 
-  const { data: expenses = [], isLoading, error } = useQuery('expenses', async () => {
-    const response = await api.get('/api/bills');
+  const {
+    data: expenses = [],
+    isLoading,
+    error,
+  } = useQuery("expenses", async () => {
+    const response = await api.get("/api/bills");
     return response.data.sort((a, b) => new Date(b.date) - new Date(a.date));
   });
 
@@ -48,14 +36,14 @@ const Recent = () => {
     try {
       await api.delete(`/api/bills/${selectedExpense.id}`);
       setDeleteDialogOpen(false);
-      toast.success('Expense deleted successfully');
-      queryClient.invalidateQueries('expenses');
+      toast.success("Expense deleted successfully");
+      queryClient.invalidateQueries("expenses");
       if (currentIndex >= expenses.length - 1) {
         setCurrentIndex(Math.max(0, currentIndex - 1));
       }
     } catch (error) {
-      toast.error('Error deleting expense');
-      console.error('Error:', error);
+      toast.error("Error deleting expense");
+      console.error("Error:", error);
     }
   };
 
@@ -67,182 +55,183 @@ const Recent = () => {
   const handleSaveEdit = async (updatedExpense) => {
     try {
       await api.put(`/api/bills/${updatedExpense.id}`, updatedExpense);
-      queryClient.invalidateQueries('expenses');
+      queryClient.invalidateQueries("expenses");
       setEditDialogOpen(false);
-      toast.success('Expense updated successfully');
+      toast.success("Expense updated successfully");
     } catch (error) {
-      toast.error('Error updating expense');
-      console.error('Error:', error);
+      toast.error("Error updating expense");
+      console.error("Error:", error);
     }
   };
 
-  if (isLoading) return <CircularProgress />;
-  if (error) return <Alert severity="error">{error.message}</Alert>;
-  if (!expenses.length) return <Alert severity="info">No recent expenses found</Alert>;
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-12">
+        <div className="w-12 h-12 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+        {error.message}
+      </div>
+    );
+  }
+
+  if (!expenses.length) {
+    return (
+      <div className="p-4 bg-blue-100 border border-blue-400 text-blue-700 rounded-lg">
+        No recent expenses found
+      </div>
+    );
+  }
 
   const currentExpense = expenses[currentIndex];
 
   return (
-    <Box>
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        mb: 2 
-      }}>
-        <Typography variant="h4">Recent Expenses</Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Button
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-gray-900">Recent Expenses</h1>
+        <div className="flex items-center gap-3">
+          <button
             onClick={handlePrevious}
             disabled={currentIndex === 0}
-            startIcon={<KeyboardArrowLeft />}
-            size="small"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors"
           >
+            <ArrowLeftIcon className="w-5 h-5" />
             Previous
-          </Button>
-          <Typography variant="body2" sx={{ mx: 1 }}>
+          </button>
+          <span className="text-sm text-gray-600 mx-2 min-w-max">
             {currentIndex + 1} of {expenses.length}
-          </Typography>
-          <Button
+          </span>
+          <button
             onClick={handleNext}
             disabled={currentIndex === expenses.length - 1}
-            endIcon={<KeyboardArrowRight />}
-            size="small"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors"
           >
             Next
-          </Button>
-        </Box>
-      </Box>
-      
-      <Box sx={{ position: 'relative' }}>
-        <Card 
-          elevation={3}
-          sx={{
-            maxWidth: 800,
-            mx: 'auto',
-            bgcolor: '#fff',
-            borderRadius: 2,
-            transition: 'transform 0.3s ease-in-out',
-            '&:hover': { transform: 'scale(1.02)' }
-          }}
-        >
-          <CardContent sx={{ p: 2 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <IconButton 
-                color="primary" 
-                sx={{ mr: 1 }}
-                onClick={() => handleEdit(currentExpense)}
+            <ArrowRightIcon className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
+          <div className="flex justify-end gap-2 mb-4">
+            <button
+              onClick={() => handleEdit(currentExpense)}
+              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            >
+              <PencilIcon className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => {
+                setSelectedExpense(currentExpense);
+                setDeleteDialogOpen(true);
+              }}
+              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            >
+              <TrashIcon className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            <h2 className="text-2xl font-bold text-blue-600">
+              {currentExpense.vendor}
+            </h2>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4 border-y border-gray-200">
+              <DetailItem
+                label="Date"
+                value={new Date(currentExpense.date).toLocaleDateString(
+                  "en-US",
+                  {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  },
+                )}
+              />
+              <DetailItem
+                label="Payment Method"
+                value={currentExpense.paymentMethod}
+              />
+            </div>
+
+            <DetailItem
+              label="Total Amount"
+              value={`₹${Number(currentExpense.totalAmount).toFixed(2)}`}
+              large
+            />
+
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                Line Items
+              </h3>
+              <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                {currentExpense.lineItems.map((item, index) => (
+                  <div
+                    key={index}
+                    className={`flex justify-between items-start py-3 ${
+                      index !== currentExpense.lineItems.length - 1
+                        ? "border-b border-gray-200"
+                        : ""
+                    }`}
+                  >
+                    <div>
+                      <p className="font-semibold text-gray-900">
+                        {item.itemName}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xs text-gray-500">
+                          {Number(item.quantity).toString()} ×
+                        </span>
+                        <span className="text-xs font-semibold text-blue-600 bg-blue-100 px-3 py-1 rounded-full border border-blue-300">
+                          ₹{Number(item.unitPrice).toString()}
+                        </span>
+                      </div>
+                    </div>
+                    <p className="text-lg font-semibold text-blue-600">
+                      ₹{item.totalPrice.toFixed(2)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {deleteDialogOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm">
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">
+              Confirm Delete
+            </h2>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete this expense from{" "}
+              <strong>{selectedExpense?.vendor}</strong>?
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setDeleteDialogOpen(false)}
+                className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
               >
-                <EditIcon />
-              </IconButton>
-              <IconButton 
-                color="error"
-                onClick={() => {
-                  setSelectedExpense(currentExpense);
-                  setDeleteDialogOpen(true);
-                }}
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
               >
-                <DeleteIcon />
-              </IconButton>
-            </Box>
-
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <Typography variant="h5" gutterBottom color="primary">
-                  {currentExpense.vendor}
-                </Typography>
-              </Grid>
-              
-              <Grid item xs={12} sm={6}>
-                <DetailItem 
-                  label="Date" 
-                  value={new Date(currentExpense.date).toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })} 
-                />
-              </Grid>
-              
-              <Grid item xs={12} sm={6}>
-                <DetailItem 
-                  label="Payment Method" 
-                  value={currentExpense.paymentMethod} 
-                />
-              </Grid>
-              
-              <Grid item xs={12}>
-                <DetailItem 
-                  label="Total Amount" 
-                  value={`₹${Number(currentExpense.totalAmount).toFixed(2)}`}
-                  large 
-                />
-              </Grid>
-
-              <Grid item xs={12}>
-                <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 500 }}>
-                  Line Items
-                </Typography>
-                <Box sx={{ bgcolor: '#f8f9fa', p: 1, borderRadius: 1 }}>
-                  {currentExpense.lineItems.map((item, index) => (
-                    <Box
-                      key={index} 
-                      sx={{ 
-                        py: 0.5,
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        borderBottom: index !== currentExpense.lineItems.length - 1 ? '1px solid #e0e0e0' : 'none'
-                      }}
-                    >
-                      <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                          {item.itemName}
-                        </Typography>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                          <Typography variant="caption" color="text.secondary">
-                            {Number(item.quantity).toString()} ×
-                          </Typography>
-                          <Typography variant="caption" sx={{ 
-                            color: 'primary.main',
-                            fontWeight: 600,
-                            bgcolor: '#e3f2fd',
-                            px: 1.5,
-                            py: 0.5,
-                            borderRadius: '12px',
-                            border: '1px solid',
-                            borderColor: 'primary.light'
-                          }}>
-                            ₹{Number(item.unitPrice).toString()}
-                          </Typography>
-                        </Box>
-                      </Box>
-                      <Typography variant="body1" color="primary" fontWeight={500}>
-                        ₹{item.totalPrice.toFixed(2)}
-                      </Typography>
-                    </Box>
-                  ))}
-                </Box>
-              </Grid>
-            </Grid>
-          </CardContent>
-        </Card>
-      </Box>
-
-      <Dialog
-        open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-      >
-        <DialogTitle>Confirm Delete</DialogTitle>
-        <DialogContent>
-          Are you sure you want to delete this expense from {selectedExpense?.vendor}?
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleDelete} color="error">Delete</Button>
-        </DialogActions>
-      </Dialog>
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <ExpenseEditDialog
         open={editDialogOpen}
@@ -250,26 +239,19 @@ const Recent = () => {
         expense={selectedExpense}
         onSave={handleSaveEdit}
       />
-    </Box>
+    </div>
   );
 };
 
 const DetailItem = ({ label, value, large }) => (
-  <Box>
-    <Typography 
-      variant="caption" 
-      color="text.secondary" 
-      display="block"
-    >
-      {label}
-    </Typography>
-    <Typography 
-      variant={large ? "h6" : "body1"} 
-      color={large ? "primary" : "text.primary"}
+  <div>
+    <p className="text-xs text-gray-500 uppercase tracking-wide">{label}</p>
+    <p
+      className={`text-gray-900 ${large ? "text-2xl font-bold text-blue-600" : "text-lg font-semibold"}`}
     >
       {value}
-    </Typography>
-  </Box>
+    </p>
+  </div>
 );
 
 export default Recent;

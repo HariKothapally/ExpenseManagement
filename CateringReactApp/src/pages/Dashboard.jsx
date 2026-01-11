@@ -1,70 +1,61 @@
-import React from 'react';
-import { useQuery } from 'react-query';
-import {
-  Box,
-  Typography,
-  Grid,
-  Paper,
-  CircularProgress,
-  Card,
-  CardContent,
-  List,
-  ListItem,
-  ListItemText,
-  Divider,
-  Alert
-} from '@mui/material';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import ReceiptIcon from '@mui/icons-material/Receipt';
-import { api } from '../services/api';
+import React from "react";
+import { useQuery } from "react-query";
+import { BanknotesIcon } from "@heroicons/react/24/solid";
+import { ShoppingCartIcon } from "@heroicons/react/24/solid";
+import { ReceiptRefundIcon } from "@heroicons/react/24/solid";
+import { DocumentTextIcon } from "@heroicons/react/24/solid";
 
-const StatCard = ({ title, value, icon, color }) => (
-  <Card sx={{ height: '100%' }}>
-    <CardContent>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        <Box sx={{ 
-          p: 1, 
-          borderRadius: 1, 
-          backgroundColor: `${color}.light`,
-          display: 'flex',
-          alignItems: 'center'
-        }}>
-          {icon}
-        </Box>
-        <Typography 
-          variant="h6" 
-          sx={{ ml: 2, color: 'text.primary', fontWeight: 500 }}
-        >
-          {title}
-        </Typography>
-      </Box>
-      <Typography variant="h4" sx={{ color: color.main, fontWeight: 600 }}>
+import { api } from "../services/api";
+
+const StatCard = ({ title, value, icon, color }) => {
+  const colorClasses = {
+    success: "bg-green-50 text-green-600",
+    info: "bg-blue-50 text-blue-600",
+    warning: "bg-amber-50 text-amber-600",
+  };
+
+  const valueColorClasses = {
+    success: "text-green-600",
+    info: "text-blue-600",
+    warning: "text-amber-600",
+  };
+
+  return (
+    <div className="h-full bg-white rounded-lg shadow p-6">
+      <div className="flex items-center mb-4">
+        <div className={`p-3 rounded-lg ${colorClasses[color]}`}>{icon}</div>
+        <h3 className="ml-4 text-lg font-medium text-gray-900">{title}</h3>
+      </div>
+      <p className={`text-3xl font-bold ${valueColorClasses[color]}`}>
         {value}
-      </Typography>
-    </CardContent>
-  </Card>
-);
+      </p>
+    </div>
+  );
+};
 
 const Dashboard = () => {
-  const { data: expenses, isLoading, error } = useQuery('expenses', async () => {
-    const response = await api.get('/api/bills');
+  const {
+    data: expenses,
+    isLoading,
+    error,
+  } = useQuery("expenses", async () => {
+    const response = await api.get("/api/bills");
     return response.data;
   });
 
   if (isLoading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-        <CircularProgress />
-      </Box>
+      <div className="flex justify-center mt-8">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <Alert severity="error" sx={{ mt: 2 }}>
+      <div className="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
         Error loading dashboard data: {error.message}
-      </Alert>
+      </div>
     );
   }
 
@@ -81,93 +72,84 @@ const Dashboard = () => {
   }, {});
 
   return (
-    <Box>
-      <Typography variant="h4" gutterBottom sx={{ mb: 4 }}>
-        Dashboard
-      </Typography>
+    <div>
+      <h1 className="text-3xl font-bold mb-6 text-gray-900">Dashboard</h1>
 
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} md={4}>
-          <StatCard
-            title="Total Expenses"
-            value={`₹${totalExpenses.toFixed(2)}`}
-            icon={<AttachMoneyIcon sx={{ color: 'success.main' }} />}
-            color="success"
-          />
-        </Grid>
-        <Grid item xs={12} md={4}>
-          <StatCard
-            title="Average Expense"
-            value={`₹${averageExpense.toFixed(2)}`}
-            icon={<ShoppingCartIcon sx={{ color: 'info.main' }} />}
-            color="info"
-          />
-        </Grid>
-        <Grid item xs={12} md={4}>
-          <StatCard
-            title="Total Bills"
-            value={expenses.length}
-            icon={<ReceiptIcon sx={{ color: 'warning.main' }} />}
-            color="warning"
-          />
-        </Grid>
-      </Grid>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <StatCard
+          title="Total Expenses"
+          value={`₹${totalExpenses.toFixed(2)}`}
+          icon={<BanknotesIcon className="w-6 h-6" />}
+          color="success"
+        />
+        <StatCard
+          title="Average Expense"
+          value={`₹${averageExpense.toFixed(2)}`}
+          icon={<ShoppingCartIcon className="w-6 h-6" />}
+          color="info"
+        />
+        <StatCard
+          title="Total Bills"
+          value={expenses.length}
+          icon={<DocumentTextIcon className="w-6 h-6" />}
+          color="warning"
+        />
+      </div>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={7}>
-          <Paper sx={{ p: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              Monthly Expenses
-            </Typography>
-            <Box sx={{ 
-              height: 300,
-              display: 'flex',
-              alignItems: 'flex-end',
-              justifyContent: 'space-around',
-              pt: 2 
-            }}>
-              {Object.entries(monthlyTotals).map(([month, total]) => (
-                <Box key={month} sx={{ textAlign: 'center' }}>
-                  <Box sx={{ 
-                    width: 40,
-                    backgroundColor: 'primary.main',
+      <div className="grid grid-cols-1 md:grid-cols-7 gap-6">
+        <div className="md:col-span-4 bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold mb-4 text-gray-900">
+            Monthly Expenses
+          </h2>
+          <div className="h-64 flex items-end justify-around pt-4 gap-2">
+            {Object.entries(monthlyTotals).map(([month, total]) => (
+              <div key={month} className="flex flex-col items-center">
+                <div
+                  className="w-10 bg-blue-600 rounded-t"
+                  style={{
                     height: `${(total / totalExpenses) * 200}px`,
-                    minHeight: 20,
-                    borderRadius: '4px 4px 0 0'
-                  }} />
-                  <Typography variant="caption">
-                    {new Date(2024, month).toLocaleString('default', { month: 'short' })}
-                  </Typography>
-                </Box>
-              ))}
-            </Box>
-          </Paper>
-        </Grid>
-        <Grid item xs={12} md={5}>
-          <Paper sx={{ p: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              Recent Transactions
-            </Typography>
-            <List>
-              {recentExpenses.map((expense, index) => (
-                <React.Fragment key={expense.id}>
-                  <ListItem>
-                    <ListItemText
-                      primary={expense.vendor}
-                      secondary={new Date(expense.date).toLocaleDateString()}
-                    />
-                    <Typography variant="body2" sx={{ color: 'success.main', fontWeight: 600 }}>
-                      ₹{expense.totalAmount.toFixed(2)}
-                    </Typography>
-                  </ListItem>
-                  {index < recentExpenses.length - 1 && <Divider />}
-                </React.Fragment>
-              ))}
-            </List>
-          </Paper>
-        </Grid>
-      </Grid>
-    </Box>
+                    minHeight: "20px",
+                  }}
+                />
+                <p className="text-xs text-gray-600 mt-2">
+                  {new Date(2024, month).toLocaleString("default", {
+                    month: "short",
+                  })}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="md:col-span-3 bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold mb-4 text-gray-900">
+            Recent Transactions
+          </h2>
+          <div className="space-y-0">
+            {recentExpenses.map((expense, index) => (
+              <React.Fragment key={expense.id}>
+                <div className="py-3 flex justify-between items-center">
+                  <div>
+                    <p className="font-medium text-gray-900">
+                      {expense.vendor}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {new Date(expense.date).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <p className="font-semibold text-green-600">
+                    ₹{expense.totalAmount.toFixed(2)}
+                  </p>
+                </div>
+                {index < recentExpenses.length - 1 && (
+                  <div className="border-t border-gray-200"></div>
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

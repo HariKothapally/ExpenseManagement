@@ -1,11 +1,10 @@
-import { useState } from 'react';
-import { Box, Typography, Link } from '@mui/material';
-import { FormField, LoadingButton } from '../common';
-import { auth } from '../../services/api';
-import toast from 'react-hot-toast';
+import { useState } from "react";
+import { FormField, LoadingButton } from "../common";
+import { auth } from "../../services/api";
+import toast from "react-hot-toast";
 
 export default function ForgotPassword({ onBack }) {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -13,19 +12,24 @@ export default function ForgotPassword({ onBack }) {
     setIsLoading(true);
     try {
       await auth.forgotPassword({ email });
-      toast.success('Password reset instructions sent to your email');
+      toast.success("Password reset instructions sent to your email");
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to send reset instructions');
+      toast.error(
+        error.response?.data?.message || "Failed to send reset instructions",
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit}>
-      <Typography variant="h6" gutterBottom>
-        Reset Password
-      </Typography>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          Reset Password
+        </h2>
+      </div>
+
       <FormField
         name="email"
         label="Email"
@@ -33,25 +37,26 @@ export default function ForgotPassword({ onBack }) {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         required
+        placeholder="Enter your email address"
       />
+
       <LoadingButton
         type="submit"
-        variant="contained"
-        fullWidth
         loading={isLoading}
-        sx={{ mt: 2 }}
+        className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 font-medium transition-colors"
       >
         Send Reset Instructions
       </LoadingButton>
-      <Box sx={{ mt: 2, textAlign: 'center' }}>
-        <Link
-          component="button"
-          variant="body2"
+
+      <div className="text-center mt-4">
+        <button
+          type="button"
           onClick={onBack}
+          className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors"
         >
           Back to Login
-        </Link>
-      </Box>
-    </Box>
+        </button>
+      </div>
+    </form>
   );
 }

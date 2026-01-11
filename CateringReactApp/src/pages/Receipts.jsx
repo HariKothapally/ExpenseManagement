@@ -1,27 +1,18 @@
-import React from 'react';
-import { Paper, Typography } from '@mui/material';
-import ComingSoonIcon from '@mui/icons-material/NewReleases';
+import React from "react";
+import { SparklesIcon } from "@heroicons/react/24/outline";
 
 const Receipts = () => {
   return (
-    <Paper 
-      sx={{ 
-        p: 6, 
-        textAlign: 'center',
-        backgroundColor: '#ffffff'
-      }}
-    >
-      <ComingSoonIcon sx={{ fontSize: 80, color: 'primary.main', mb: 3 }} />
-      <Typography variant="h4" gutterBottom sx={{ color: '#2c3e50', fontWeight: 600 }}>
-        Coming Soon
-      </Typography>
-      <Typography variant="body1" sx={{ color: '#546e7a', mb: 2 }}>
+    <div className="bg-white rounded-lg shadow p-12 text-center">
+      <SparklesIcon className="w-20 h-20 text-blue-600 mx-auto mb-6" />
+      <h1 className="text-3xl font-bold text-gray-900 mb-3">Coming Soon</h1>
+      <p className="text-gray-600 mb-2">
         We're working on bringing you a better way to manage your receipts.
-      </Typography>
-      <Typography variant="body2" sx={{ color: '#546e7a' }}>
+      </p>
+      <p className="text-gray-600 text-sm">
         This feature will be available in the next update.
-      </Typography>
-    </Paper>
+      </p>
+    </div>
   );
 };
 

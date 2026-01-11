@@ -1,5 +1,4 @@
-import { Component } from 'react';
-import { Box, Typography, Button } from '@mui/material';
+import { Component } from "react";
 
 export default class ErrorBoundary extends Component {
   constructor(props) {
@@ -14,17 +13,17 @@ export default class ErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return (
-        <Box sx={{ p: 3, textAlign: 'center' }}>
-          <Typography variant="h5" gutterBottom>
+        <div className="p-6 text-center">
+          <h2 className="text-2xl font-semibold text-gray-900 mb-4">
             Something went wrong
-          </Typography>
-          <Button
-            variant="contained"
+          </h2>
+          <button
             onClick={() => window.location.reload()}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
           >
             Reload Page
-          </Button>
-        </Box>
+          </button>
+        </div>
       );
     }
 

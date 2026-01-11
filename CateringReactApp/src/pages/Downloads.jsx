@@ -1,58 +1,58 @@
-import React, { useState } from 'react';
-import { useQuery } from 'react-query';
-import {
-  Box,
-  Typography,
-  Paper,
-  Grid,
-  TextField,
-  Button,
-  MenuItem,
-  CircularProgress
-} from '@mui/material';
-import DownloadIcon from '@mui/icons-material/Download';
-import { DatePicker } from '@mui/x-date-pickers';
-import dayjs from 'dayjs';
-import { api } from '../services/api';
-import toast from 'react-hot-toast';
-import * as XLSX from 'xlsx';
+import React, { useState } from "react";
+import { useQuery } from "react-query";
+import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
+import dayjs from "dayjs";
+import { api } from "../services/api";
+import toast from "react-hot-toast";
+import * as XLSX from "xlsx";
 
 const Downloads = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  const [filterType, setFilterType] = useState('custom');
+  const [filterType, setFilterType] = useState("custom");
   const [loading, setLoading] = useState(false);
 
-  const { data: expenses, isLoading: fetchingData } = useQuery('expenses', async () => {
-    const response = await api.get('/api/bills');
-    return response.data;
-  });
+  const { data: expenses, isLoading: fetchingData } = useQuery(
+    "expenses",
+    async () => {
+      const response = await api.get("/api/bills");
+      return response.data;
+    },
+  );
 
   const filterExpenses = (expenses) => {
     if (!expenses) return [];
-    
-    return expenses.filter(expense => {
+
+    return expenses.filter((expense) => {
       const expenseDate = dayjs(expense.date);
-      
-      if (filterType === 'custom') {
+
+      if (filterType === "custom") {
         if (!startDate || !endDate) return false;
         return expenseDate.isAfter(startDate) && expenseDate.isBefore(endDate);
       }
 
       const now = dayjs();
       switch (filterType) {
-        case 'thisMonth':
-          return expenseDate.isAfter(now.startOf('month')) && 
-                 expenseDate.isBefore(now.endOf('month'));
-        case 'lastMonth':
-          return expenseDate.isAfter(now.subtract(1, 'month').startOf('month')) && 
-                 expenseDate.isBefore(now.subtract(1, 'month').endOf('month'));
-        case 'thisYear':
-          return expenseDate.isAfter(now.startOf('year')) && 
-                 expenseDate.isBefore(now.endOf('year'));
-        case 'lastYear':
-          return expenseDate.isAfter(now.subtract(1, 'year').startOf('year')) && 
-                 expenseDate.isBefore(now.endOf('year'));
+        case "thisMonth":
+          return (
+            expenseDate.isAfter(now.startOf("month")) &&
+            expenseDate.isBefore(now.endOf("month"))
+          );
+        case "lastMonth":
+          return (
+            expenseDate.isAfter(now.subtract(1, "month").startOf("month")) &&
+            expenseDate.isBefore(now.subtract(1, "month").endOf("month"))
+          );
+        case "thisYear":
+          return (
+            expenseDate.isAfter(now.startOf("year")) &&
+            expenseDate.isBefore(now.endOf("year"))
+          );
+        case "lastYear":
+          return (
+            expenseDate.isAfter(now.subtract(1, "year").startOf("year")) &&
+            expenseDate.isBefore(now.endOf("year"))
+          );
         default:
           return true;
       }
@@ -63,60 +63,60 @@ const Downloads = () => {
     setLoading(true);
     try {
       const filteredExpenses = filterExpenses(expenses);
-      
+
       if (filteredExpenses.length === 0) {
-        toast.error('No expenses found for the selected period');
+        toast.error("No expenses found for the selected period");
         return;
       }
 
       // Prepare data for Excel with inline items
       const excelData = [];
-      filteredExpenses.forEach(expense => {
+      filteredExpenses.forEach((expense) => {
         // Add main expense row
         excelData.push({
           Date: new Date(expense.date).toLocaleDateString(),
           Vendor: expense.vendor,
-          'Total Amount': expense.totalAmount.toFixed(2),
-          'Payment Method': expense.paymentMethod,
-          'Items Count': expense.lineItems?.length || 0,
-          'Item Name': '',
-          'Quantity': '',
-          'Unit Price': '',
-          'Item Total': ''
+          "Total Amount": expense.totalAmount.toFixed(2),
+          "Payment Method": expense.paymentMethod,
+          "Items Count": expense.lineItems?.length || 0,
+          "Item Name": "",
+          Quantity: "",
+          "Unit Price": "",
+          "Item Total": "",
         });
 
         // Add line items
-        expense.lineItems?.forEach(item => {
+        expense.lineItems?.forEach((item) => {
           excelData.push({
-            Date: '',
-            Vendor: '',
-            'Total Amount': '',
-            'Payment Method': '',
-            'Items Count': '',
-            'Item Name': item.itemName,
-            'Quantity': item.quantity,
-            'Unit Price': item.unitPrice.toFixed(2),
-            'Item Total': item.totalPrice.toFixed(2)
+            Date: "",
+            Vendor: "",
+            "Total Amount": "",
+            "Payment Method": "",
+            "Items Count": "",
+            "Item Name": item.itemName,
+            Quantity: item.quantity,
+            "Unit Price": item.unitPrice.toFixed(2),
+            "Item Total": item.totalPrice.toFixed(2),
           });
         });
 
         // Add empty row for separation
         excelData.push({
-          Date: '',
-          Vendor: '',
-          'Total Amount': '',
-          'Payment Method': '',
-          'Items Count': '',
-          'Item Name': '',
-          'Quantity': '',
-          'Unit Price': '',
-          'Item Total': ''
+          Date: "",
+          Vendor: "",
+          "Total Amount": "",
+          "Payment Method": "",
+          "Items Count": "",
+          "Item Name": "",
+          Quantity: "",
+          "Unit Price": "",
+          "Item Total": "",
         });
       });
 
       // Create worksheet with styling
       const ws = XLSX.utils.json_to_sheet(excelData);
-      
+
       // Set column widths
       const columnWidths = [
         { wch: 12 }, // Date
@@ -129,40 +129,40 @@ const Downloads = () => {
         { wch: 12 }, // Unit Price
         { wch: 12 }, // Item Total
       ];
-      ws['!cols'] = columnWidths;
+      ws["!cols"] = columnWidths;
 
       const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Expenses');
+      XLSX.utils.book_append_sheet(wb, ws, "Expenses");
 
       // Generate Excel file
-      const fileName = `expenses_${filterType}_${new Date().toISOString().split('T')[0]}.xlsx`;
+      const fileName = `expenses_${filterType}_${new Date().toISOString().split("T")[0]}.xlsx`;
       XLSX.writeFile(wb, fileName);
-      toast.success('File downloaded successfully');
+      toast.success("File downloaded successfully");
     } catch (error) {
-      toast.error('Error creating Excel file');
-      console.error('Download error:', error);
+      toast.error("Error creating Excel file");
+      console.error("Download error:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleFilterTypeChange = (event) => {
-    const type = event.target.value;
+  const handleFilterTypeChange = (e) => {
+    const type = e.target.value;
     setFilterType(type);
-    
+
     const now = dayjs();
-    if (type === 'thisMonth') {
-      setStartDate(now.startOf('month'));
-      setEndDate(now.endOf('month'));
-    } else if (type === 'lastMonth') {
-      setStartDate(now.subtract(1, 'month').startOf('month'));
-      setEndDate(now.subtract(1, 'month').endOf('month'));
-    } else if (type === 'thisYear') {
-      setStartDate(now.startOf('year'));
-      setEndDate(now.endOf('year'));
-    } else if (type === 'lastYear') {
-      setStartDate(now.subtract(1, 'year').startOf('year'));
-      setEndDate(now.endOf('year'));
+    if (type === "thisMonth") {
+      setStartDate(now.startOf("month"));
+      setEndDate(now.endOf("month"));
+    } else if (type === "lastMonth") {
+      setStartDate(now.subtract(1, "month").startOf("month"));
+      setEndDate(now.subtract(1, "month").endOf("month"));
+    } else if (type === "thisYear") {
+      setStartDate(now.startOf("year"));
+      setEndDate(now.endOf("year"));
+    } else if (type === "lastYear") {
+      setStartDate(now.subtract(1, "year").startOf("year"));
+      setEndDate(now.endOf("year"));
     } else {
       setStartDate(null);
       setEndDate(null);
@@ -170,64 +170,88 @@ const Downloads = () => {
   };
 
   return (
-    <Box>
-      <Typography variant="h4" gutterBottom>
+    <div>
+      <h1 className="text-3xl font-bold mb-6 text-gray-900">
         Download Expenses
-      </Typography>
+      </h1>
 
-      <Paper sx={{ p: 3, mt: 3 }}>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={4}>
-            <TextField
-              select
-              fullWidth
-              label="Filter Type"
+      <div className="bg-white rounded-lg shadow p-6 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Filter Type
+            </label>
+            <select
               value={filterType}
               onChange={handleFilterTypeChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <MenuItem value="custom">Custom Date Range</MenuItem>
-              <MenuItem value="thisMonth">This Month</MenuItem>
-              <MenuItem value="lastMonth">Last Month</MenuItem>
-              <MenuItem value="thisYear">This Year</MenuItem>
-              <MenuItem value="lastYear">Last Year</MenuItem>
-            </TextField>
-          </Grid>
+              <option value="custom">Custom Date Range</option>
+              <option value="thisMonth">This Month</option>
+              <option value="lastMonth">Last Month</option>
+              <option value="thisYear">This Year</option>
+              <option value="lastYear">Last Year</option>
+            </select>
+          </div>
 
-          {filterType === 'custom' && (
+          {filterType === "custom" && (
             <>
-              <Grid item xs={12} md={4}>
-                <DatePicker
-                  label="Start Date"
-                  value={startDate}
-                  onChange={(newValue) => setStartDate(newValue)}
-                  slotProps={{ textField: { fullWidth: true } }}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Start Date
+                </label>
+                <input
+                  type="date"
+                  value={startDate ? startDate.format("YYYY-MM-DD") : ""}
+                  onChange={(e) =>
+                    setStartDate(e.target.value ? dayjs(e.target.value) : null)
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <DatePicker
-                  label="End Date"
-                  value={endDate}
-                  onChange={(newValue) => setEndDate(newValue)}
-                  slotProps={{ textField: { fullWidth: true } }}
-                  minDate={startDate}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  End Date
+                </label>
+                <input
+                  type="date"
+                  value={endDate ? endDate.format("YYYY-MM-DD") : ""}
+                  onChange={(e) =>
+                    setEndDate(e.target.value ? dayjs(e.target.value) : null)
+                  }
+                  min={startDate ? startDate.format("YYYY-MM-DD") : ""}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-              </Grid>
+              </div>
             </>
           )}
 
-          <Grid item xs={12}>
-            <Button
-              variant="contained"
-              startIcon={loading || fetchingData ? <CircularProgress size={20} /> : <DownloadIcon />}
+          <div className="flex items-end">
+            <button
               onClick={handleDownload}
-              disabled={loading || fetchingData || (filterType === 'custom' && (!startDate || !endDate))}
+              disabled={
+                loading ||
+                fetchingData ||
+                (filterType === "custom" && (!startDate || !endDate))
+              }
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium"
             >
-              Download Excel
-            </Button>
-          </Grid>
-        </Grid>
-      </Paper>
-    </Box>
+              {loading || fetchingData ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Downloading...
+                </>
+              ) : (
+                <>
+                  <ArrowDownTrayIcon className="w-5 h-5" />
+                  Download Excel
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

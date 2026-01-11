@@ -1,10 +1,10 @@
-import { Box, CircularProgress, Typography } from '@mui/material';
-
-export default function LoadingState({ message = 'Loading...' }) {
+export default function LoadingState({ message = "Loading..." }) {
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 3 }}>
-      <CircularProgress sx={{ mb: 2 }} />
-      <Typography color="text.secondary">{message}</Typography>
-    </Box>
+    <div className="flex flex-col items-center justify-center p-6">
+      <div className="mb-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+      <p className="text-gray-500">{message}</p>
+    </div>
   );
 }

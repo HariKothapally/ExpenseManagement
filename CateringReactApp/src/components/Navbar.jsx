@@ -1,85 +1,70 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Box, List, ListItem, ListItemIcon, ListItemText, Button } from '@mui/material';
-import { useAuth } from '../contexts/AuthContext';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import UploadFileIcon from '@mui/icons-material/UploadFile';
-import ReceiptIcon from '@mui/icons-material/Receipt';
-import LogoutIcon from '@mui/icons-material/Logout';
-import DescriptionIcon from '@mui/icons-material/Description';
-import HistoryIcon from '@mui/icons-material/History';
-import DownloadIcon from '@mui/icons-material/Download';
+import React from "react";
+import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import {
+  RectangleStackIcon,
+  ClockIcon,
+  ReceiptPercentIcon,
+  DocumentTextIcon,
+  ArrowUpTrayIcon,
+  ArrowDownTrayIcon,
+  ArrowLeftOnRectangleIcon,
+} from "@heroicons/react/24/outline";
 
 const Navbar = () => {
   const { logout } = useAuth();
   const location = useLocation();
 
   const menuItems = [
-    { text: 'Dashboard', path: '/dashboard', icon: <DashboardIcon /> },
-    { text: 'Recent', path: '/recent', icon: <HistoryIcon /> },
-    { text: 'Expenditures', path: '/expenditures', icon: <ReceiptIcon /> },
-    { text: 'Receipts', path: '/receipts', icon: <DescriptionIcon /> },
-    { text: 'Upload', path: '/upload', icon: <UploadFileIcon /> },
-    { text: 'Downloads', path: '/downloads', icon: <DownloadIcon /> }
+    { text: "Dashboard", path: "/dashboard", icon: RectangleStackIcon },
+    { text: "Recent", path: "/recent", icon: ClockIcon },
+    { text: "Expenditures", path: "/expenditures", icon: ReceiptPercentIcon },
+    { text: "Receipts", path: "/receipts", icon: DocumentTextIcon },
+    { text: "Upload", path: "/upload", icon: ArrowUpTrayIcon },
+    { text: "Downloads", path: "/downloads", icon: ArrowDownTrayIcon },
   ];
 
   return (
-    <Box sx={{ 
-      width: 240,
-      backgroundColor: '#ffffff',
-      borderRight: '1px solid #e0e0e0',
-      display: 'flex',
-      flexDirection: 'column',
-      height: '100%'
-    }}>
-      <List>
-        {menuItems.map((item) => (
-          <ListItem 
-            key={item.text}
-            component={Link} 
-            to={item.path}
-            sx={{
-              color: location.pathname === item.path ? '#1976d2' : '#2c3e50',
-              backgroundColor: location.pathname === item.path ? '#e3f2fd' : 'transparent',
-              '&:hover': {
-                backgroundColor: '#f5f5f5',
-                color: '#1976d2'
-              }
-            }}
-          >
-            <ListItemIcon sx={{ 
-              color: location.pathname === item.path ? '#1976d2' : '#546e7a'
-            }}>
-              {item.icon}
-            </ListItemIcon>
-            <ListItemText 
-              primary={item.text}
-              primaryTypographyProps={{
-                sx: { fontWeight: location.pathname === item.path ? 600 : 400 }
-              }}
-            />
-          </ListItem>
-        ))}
-      </List>
-      <Box sx={{ p: 2, borderTop: '1px solid #e0e0e0', mt: 'auto' }}>
-        <Button
-          fullWidth
-          startIcon={<LogoutIcon />}
+    <nav className="w-60 bg-white border-r border-gray-200 flex flex-col h-full">
+      <ul className="flex-1">
+        {menuItems.map((item) => {
+          const isActive = location.pathname === item.path;
+          const Icon = item.icon;
+          return (
+            <li key={item.text}>
+              <Link
+                to={item.path}
+                className={`flex items-center gap-3 px-4 py-3 transition-colors ${
+                  isActive
+                    ? "bg-blue-100 text-blue-700"
+                    : "text-gray-700 hover:bg-gray-100 hover:text-blue-700"
+                }`}
+              >
+                <Icon
+                  className={`w-5 h-5 flex-shrink-0 ${
+                    isActive ? "text-blue-700" : "text-gray-500"
+                  }`}
+                />
+                <span
+                  className={`text-sm ${isActive ? "font-semibold" : "font-normal"}`}
+                >
+                  {item.text}
+                </span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+      <div className="p-4 border-t border-gray-200">
+        <button
           onClick={logout}
-          variant="outlined"
-          sx={{
-            color: '#d32f2f',
-            borderColor: '#d32f2f',
-            '&:hover': {
-              borderColor: '#b71c1c',
-              backgroundColor: 'rgba(211, 47, 47, 0.04)'
-            }
-          }}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2 text-red-600 border border-red-600 rounded-lg hover:border-red-800 hover:bg-red-50 transition-colors text-sm font-medium"
         >
+          <ArrowLeftOnRectangleIcon className="w-5 h-5" />
           Logout
-        </Button>
-      </Box>
-    </Box>
+        </button>
+      </div>
+    </nav>
   );
 };
 
