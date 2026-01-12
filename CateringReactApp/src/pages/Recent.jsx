@@ -91,114 +91,122 @@ const Recent = () => {
   const currentExpense = expenses[currentIndex];
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Recent Expenses</h1>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={handlePrevious}
-            disabled={currentIndex === 0}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors"
-          >
-            <ArrowLeftIcon className="w-5 h-5" />
-            Previous
-          </button>
-          <span className="text-sm text-gray-600 mx-2 min-w-max">
-            {currentIndex + 1} of {expenses.length}
-          </span>
-          <button
-            onClick={handleNext}
-            disabled={currentIndex === expenses.length - 1}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors"
-          >
-            Next
-            <ArrowRightIcon className="w-5 h-5" />
-          </button>
+    <div className="flex flex-col h-full">
+      {/* Sticky Header */}
+      <div className="sticky top-0 bg-white z-10 pb-4 border-b border-gray-200">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+            Recent Expenses
+          </h1>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handlePrevious}
+              disabled={currentIndex === 0}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors"
+            >
+              <ArrowLeftIcon className="w-5 h-5" />
+              <span className="hidden sm:inline">Previous</span>
+            </button>
+            <span className="text-sm text-gray-600 mx-2 min-w-max whitespace-nowrap">
+              {currentIndex + 1} of {expenses.length}
+            </span>
+            <button
+              onClick={handleNext}
+              disabled={currentIndex === expenses.length - 1}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors"
+            >
+              <span className="hidden sm:inline">Next</span>
+              <ArrowRightIcon className="w-5 h-5" />
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
-          <div className="flex justify-end gap-2 mb-4">
-            <button
-              onClick={() => handleEdit(currentExpense)}
-              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-            >
-              <PencilIcon className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => {
-                setSelectedExpense(currentExpense);
-                setDeleteDialogOpen(true);
-              }}
-              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-            >
-              <TrashIcon className="w-5 h-5" />
-            </button>
-          </div>
-
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold text-blue-600">
-              {currentExpense.vendor}
-            </h2>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4 border-y border-gray-200">
-              <DetailItem
-                label="Date"
-                value={new Date(currentExpense.date).toLocaleDateString(
-                  "en-US",
-                  {
-                    weekday: "long",
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  },
-                )}
-              />
-              <DetailItem
-                label="Payment Method"
-                value={currentExpense.paymentMethod}
-              />
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-2xl mx-auto mt-6">
+          <div className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
+            <div className="flex justify-end gap-2 mb-4">
+              <button
+                onClick={() => handleEdit(currentExpense)}
+                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+              >
+                <PencilIcon className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => {
+                  setSelectedExpense(currentExpense);
+                  setDeleteDialogOpen(true);
+                }}
+                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              >
+                <TrashIcon className="w-5 h-5" />
+              </button>
             </div>
 
-            <DetailItem
-              label="Total Amount"
-              value={`₹${Number(currentExpense.totalAmount).toFixed(2)}`}
-              large
-            />
+            <div className="space-y-4">
+              <h2 className="text-2xl font-bold text-blue-600">
+                {currentExpense.vendor}
+              </h2>
 
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                Line Items
-              </h3>
-              <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-                {currentExpense.lineItems.map((item, index) => (
-                  <div
-                    key={index}
-                    className={`flex justify-between items-start py-3 ${
-                      index !== currentExpense.lineItems.length - 1
-                        ? "border-b border-gray-200"
-                        : ""
-                    }`}
-                  >
-                    <div>
-                      <p className="font-semibold text-gray-900">
-                        {item.itemName}
-                      </p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs text-gray-500">
-                          {Number(item.quantity).toString()} ×
-                        </span>
-                        <span className="text-xs font-semibold text-blue-600 bg-blue-100 px-3 py-1 rounded-full border border-blue-300">
-                          ₹{Number(item.unitPrice).toString()}
-                        </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4 border-y border-gray-200">
+                <DetailItem
+                  label="Date"
+                  value={new Date(currentExpense.date).toLocaleDateString(
+                    "en-US",
+                    {
+                      weekday: "long",
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    },
+                  )}
+                />
+                <DetailItem
+                  label="Payment Method"
+                  value={currentExpense.paymentMethod}
+                />
+              </div>
+
+              <DetailItem
+                label="Total Amount"
+                value={`₹${Number(currentExpense.totalAmount).toFixed(2)}`}
+                large
+              />
+
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                  Line Items
+                </h3>
+                <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                  {currentExpense.lineItems.map((item, index) => (
+                    <div
+                      key={index}
+                      className={`flex justify-between items-start py-3 ${
+                        index !== currentExpense.lineItems.length - 1
+                          ? "border-b border-gray-200"
+                          : ""
+                      }`}
+                    >
+                      <div>
+                        <p className="font-semibold text-gray-900">
+                          {item.itemName}
+                        </p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-xs text-gray-500">
+                            {Number(item.quantity).toString()} ×
+                          </span>
+                          <span className="text-xs font-semibold text-blue-600 bg-blue-100 px-3 py-1 rounded-full border border-blue-300">
+                            ₹{Number(item.unitPrice).toString()}
+                          </span>
+                        </div>
                       </div>
+                      <p className="text-lg font-semibold text-blue-600">
+                        ₹{item.totalPrice.toFixed(2)}
+                      </p>
                     </div>
-                    <p className="text-lg font-semibold text-blue-600">
-                      ₹{item.totalPrice.toFixed(2)}
-                    </p>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           </div>

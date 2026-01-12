@@ -8,12 +8,18 @@ import {
   DocumentTextIcon,
   ArrowUpTrayIcon,
   ArrowDownTrayIcon,
-  ArrowLeftOnRectangleIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 
-const Navbar = () => {
+const Navbar = ({ onClose }) => {
   const { logout } = useAuth();
   const location = useLocation();
+
+  const handleNavigate = () => {
+    if (onClose) {
+      onClose();
+    }
+  };
 
   const menuItems = [
     { text: "Dashboard", path: "/dashboard", icon: RectangleStackIcon },
@@ -25,8 +31,21 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="w-60 bg-white border-r border-gray-200 flex flex-col h-full">
-      <ul className="flex-1">
+    <nav className="w-full bg-white flex flex-col h-full">
+      {/* Mobile Close Button - Hidden on desktop */}
+      <div className="md:hidden flex justify-between items-center p-4 border-b border-gray-200 flex-shrink-0">
+        <h2 className="text-lg font-semibold text-gray-800">Menu</h2>
+        <button
+          onClick={onClose}
+          className="p-1 text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none transition rounded"
+          aria-label="Close menu"
+        >
+          <XMarkIcon className="w-6 h-6" />
+        </button>
+      </div>
+
+      {/* Menu Items Container - Scrollable only if needed */}
+      <ul className="flex-1 overflow-y-auto min-h-0">
         {menuItems.map((item) => {
           const isActive = location.pathname === item.path;
           const Icon = item.icon;
@@ -34,35 +53,28 @@ const Navbar = () => {
             <li key={item.text}>
               <Link
                 to={item.path}
-                className={`flex items-center gap-3 px-4 py-3 transition-colors ${
+                onClick={handleNavigate}
+                className={`flex items-center gap-3 px-3 md:px-4 py-3 transition-all border-l-4 md:border-l-4 ${
                   isActive
-                    ? "bg-blue-100 text-blue-700"
-                    : "text-gray-700 hover:bg-gray-100 hover:text-blue-700"
+                    ? "bg-blue-50 text-blue-700 border-blue-700 font-semibold"
+                    : "text-gray-700 hover:bg-gray-50 hover:text-blue-700 border-transparent hover:border-blue-300"
                 }`}
               >
                 <Icon
-                  className={`w-5 h-5 flex-shrink-0 ${
+                  className={`w-5 h-5 flex-shrink-0 transition-colors ${
                     isActive ? "text-blue-700" : "text-gray-500"
                   }`}
                 />
-                <span
-                  className={`text-sm ${isActive ? "font-semibold" : "font-normal"}`}
-                >
-                  {item.text}
-                </span>
+                <span className="text-sm">{item.text}</span>
               </Link>
             </li>
           );
         })}
       </ul>
-      <div className="p-4 border-t border-gray-200">
-        <button
-          onClick={logout}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 text-red-600 border border-red-600 rounded-lg hover:border-red-800 hover:bg-red-50 transition-colors text-sm font-medium"
-        >
-          <ArrowLeftOnRectangleIcon className="w-5 h-5" />
-          Logout
-        </button>
+
+      {/* Desktop-only footer section */}
+      <div className="hidden md:block border-t border-gray-200 p-4 text-center flex-shrink-0">
+        <p className="text-xs text-gray-500">Logout available in footer</p>
       </div>
     </nav>
   );

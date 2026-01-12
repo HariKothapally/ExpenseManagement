@@ -45,7 +45,7 @@ const Dashboard = () => {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center mt-8">
+      <div className="flex justify-center py-8">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
@@ -53,7 +53,7 @@ const Dashboard = () => {
 
   if (error) {
     return (
-      <div className="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+      <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
         Error loading dashboard data: {error.message}
       </div>
     );
@@ -72,80 +72,92 @@ const Dashboard = () => {
   }, {});
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6 text-gray-900">Dashboard</h1>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <StatCard
-          title="Total Expenses"
-          value={`₹${totalExpenses.toFixed(2)}`}
-          icon={<BanknotesIcon className="w-6 h-6" />}
-          color="success"
-        />
-        <StatCard
-          title="Average Expense"
-          value={`₹${averageExpense.toFixed(2)}`}
-          icon={<ShoppingCartIcon className="w-6 h-6" />}
-          color="info"
-        />
-        <StatCard
-          title="Total Bills"
-          value={expenses.length}
-          icon={<DocumentTextIcon className="w-6 h-6" />}
-          color="warning"
-        />
+    <div className="flex flex-col h-full overflow-hidden">
+      {/* Sticky Title */}
+      <div className="sticky top-0 bg-white z-10 pb-4 border-b border-gray-200 flex-shrink-0">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+          Dashboard
+        </h1>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-7 gap-6">
-        <div className="md:col-span-4 bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold mb-4 text-gray-900">
-            Monthly Expenses
-          </h2>
-          <div className="h-64 flex items-end justify-around pt-4 gap-2">
-            {Object.entries(monthlyTotals).map(([month, total]) => (
-              <div key={month} className="flex flex-col items-center">
-                <div
-                  className="w-10 bg-blue-600 rounded-t"
-                  style={{
-                    height: `${(total / totalExpenses) * 200}px`,
-                    minHeight: "20px",
-                  }}
-                />
-                <p className="text-xs text-gray-600 mt-2">
-                  {new Date(2024, month).toLocaleString("default", {
-                    month: "short",
-                  })}
-                </p>
-              </div>
-            ))}
-          </div>
+      {/* Content - No scrolling, fits nicely */}
+      <div className="flex-1 overflow-hidden flex flex-col gap-4 py-4">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-shrink-0">
+          <StatCard
+            title="Total Expenses"
+            value={`₹${totalExpenses.toFixed(2)}`}
+            icon={<BanknotesIcon className="w-6 h-6" />}
+            color="success"
+          />
+          <StatCard
+            title="Average Expense"
+            value={`₹${averageExpense.toFixed(2)}`}
+            icon={<ShoppingCartIcon className="w-6 h-6" />}
+            color="info"
+          />
+          <StatCard
+            title="Total Bills"
+            value={expenses.length}
+            icon={<DocumentTextIcon className="w-6 h-6" />}
+            color="warning"
+          />
         </div>
 
-        <div className="md:col-span-3 bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold mb-4 text-gray-900">
-            Recent Transactions
-          </h2>
-          <div className="space-y-0">
-            {recentExpenses.map((expense, index) => (
-              <React.Fragment key={expense.id}>
-                <div className="py-3 flex justify-between items-center">
-                  <div>
-                    <p className="font-medium text-gray-900">
-                      {expense.vendor}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {new Date(expense.date).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <p className="font-semibold text-green-600">
-                    ₹{expense.totalAmount.toFixed(2)}
+        {/* Charts and Transactions */}
+        <div className="grid grid-cols-1 md:grid-cols-7 gap-4 flex-1 overflow-hidden min-h-0">
+          {/* Monthly Expenses Chart */}
+          <div className="md:col-span-4 bg-white rounded-lg shadow p-6 flex flex-col overflow-hidden">
+            <h2 className="text-lg font-semibold mb-4 text-gray-900 flex-shrink-0">
+              Monthly Expenses
+            </h2>
+            <div className="flex-1 flex items-end justify-around gap-2 min-h-0">
+              {Object.entries(monthlyTotals).map(([month, total]) => (
+                <div key={month} className="flex flex-col items-center flex-1">
+                  <div
+                    className="w-full max-w-10 bg-blue-600 rounded-t"
+                    style={{
+                      height: `${(total / totalExpenses) * 200}px`,
+                      minHeight: "20px",
+                    }}
+                  />
+                  <p className="text-xs text-gray-600 mt-2 truncate">
+                    {new Date(2024, month).toLocaleString("default", {
+                      month: "short",
+                    })}
                   </p>
                 </div>
-                {index < recentExpenses.length - 1 && (
-                  <div className="border-t border-gray-200"></div>
-                )}
-              </React.Fragment>
-            ))}
+              ))}
+            </div>
+          </div>
+
+          {/* Recent Transactions */}
+          <div className="md:col-span-3 bg-white rounded-lg shadow p-6 flex flex-col overflow-hidden">
+            <h2 className="text-lg font-semibold mb-4 text-gray-900 flex-shrink-0">
+              Recent Transactions
+            </h2>
+            <div className="flex-1 overflow-y-auto space-y-0 min-h-0">
+              {recentExpenses.map((expense, index) => (
+                <React.Fragment key={expense.id}>
+                  <div className="py-3 flex justify-between items-center gap-4">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-gray-900 truncate">
+                        {expense.vendor}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {new Date(expense.date).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <p className="font-semibold text-green-600 flex-shrink-0">
+                      ₹{expense.totalAmount.toFixed(2)}
+                    </p>
+                  </div>
+                  {index < recentExpenses.length - 1 && (
+                    <div className="border-t border-gray-200"></div>
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
           </div>
         </div>
       </div>

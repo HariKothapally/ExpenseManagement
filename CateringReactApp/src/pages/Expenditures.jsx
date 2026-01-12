@@ -175,42 +175,51 @@ const Expenditures = () => {
   }
 
   return (
-    <>
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Expenditures</h1>
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-gray-100 border-b border-gray-200">
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 w-10"></th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
-                  Vendor
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
-                  Date
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
-                  Total Amount
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
-                  Payment Method
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {expenses?.map((expense) => (
-                <ExpenseRow
-                  key={expense.id}
-                  expense={expense}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                />
-              ))}
-            </tbody>
-          </table>
+    <div className="flex flex-col h-full">
+      {/* Sticky Title */}
+      <div className="sticky top-0 bg-white z-10 pb-4 border-b border-gray-200">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+          Expenditures
+        </h1>
+      </div>
+
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="bg-white rounded-lg shadow overflow-hidden mt-4">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gray-100 border-b border-gray-200 sticky top-0 z-10">
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 w-10"></th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
+                    Vendor
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
+                    Date
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
+                    Total Amount
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
+                    Payment Method
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {expenses?.map((expense) => (
+                  <ExpenseRow
+                    key={expense.id}
+                    expense={expense}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                  />
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -248,7 +257,7 @@ const Expenditures = () => {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };
 
