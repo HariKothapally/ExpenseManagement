@@ -1,6 +1,7 @@
 // Services/GeminiBillExtractor.cs
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 
 
@@ -77,7 +78,7 @@ public class GeminiBillExtractor : IGeminiBillExtractor
     - date: The date on the bill. Convert it to ISO 8601 UTC format (yyyy-MM-ddTHH:mm:ssZ). If time is missing, use 00:00:00. If timezone is missing assume UTC.
     - totalAmount: The final total amount due (numeric, e.g., 500.00).
     - paymentMethod: The payment method used (e.g., Credit Card, Cash). If not found, use null.
-    - lineItems: An array of items, each with itemName, quantity, unitPrice, and totalPrice. If line items are not clearly separable or present, return an empty array [].
+    - lineItems: An array of items, each with itemName, quantity, unitPrice, and totalPrice. If line items are not clearly separable or present, return an empty array []. Ensure numeric values do not have leading zeros. Use 0 for missing numeric values in line items.
     If a top-level field (vendor, date, totalAmount) cannot be reliably extracted, return null for that field's value (except for lineItems which should be []).
     Return *only* the JSON object, without any surrounding text, comments, or markdown formatting like ```json ... ```.
     ";
@@ -178,11 +179,14 @@ public class GeminiBillExtractor : IGeminiBillExtractor
                  }
             }
 
+            // Fix leading zeros in numbers which are invalid in JSON (e.g., 091091 -> 91091)
+            extractedJson = Regex.Replace(extractedJson, @"(?<=:\s*)0+(?=[1-9])", "");
 
             _logger.LogDebug("Cleaned JSON for Deserialization: {CleanedJson}", extractedJson);
 
             // Deserialize - can return null
-            var scannedBill = JsonConvert.DeserializeObject<ScannedBill>(extractedJson);
+            var settings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
+            var scannedBill = JsonConvert.DeserializeObject<ScannedBill>(extractedJson, settings);
 
             if (scannedBill == null)
             {
