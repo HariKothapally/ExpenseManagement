@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useOutletContext } from "react-router-dom";
 import { CloudArrowUpIcon } from "@heroicons/react/24/outline";
 import { CameraIcon } from "@heroicons/react/24/outline";
 import { SparklesIcon } from "@heroicons/react/24/outline";
@@ -23,6 +24,7 @@ const Upload = () => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
+  const { setIsFooterVisible } = useOutletContext() || { setIsFooterVisible: () => {} };
 
   // Detect mobile on mount and resize
   useEffect(() => {
@@ -40,6 +42,10 @@ const Upload = () => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    return () => setIsFooterVisible(true);
+  }, [setIsFooterVisible]);
 
   const compressImage = async (file) => {
     return new Promise((resolve) => {
@@ -115,6 +121,7 @@ const Upload = () => {
       });
       setUploadResponse(response.data);
       setShowSuccessDialog(true);
+      setIsFooterVisible(false);
       toast.success("Image uploaded successfully");
       setFile(null);
     } catch (err) {
@@ -190,6 +197,7 @@ const Upload = () => {
       streamRef.current = null;
     }
     setShowCameraModal(false);
+    setIsFooterVisible(true);
     setCameraError("");
   };
 
@@ -245,11 +253,13 @@ const Upload = () => {
 
   const onCloseDialog = () => {
     setShowSuccessDialog(false);
+    setIsFooterVisible(true);
     setUploadResponse(null);
   };
 
   const openCameraModal = () => {
     setShowCameraModal(true);
+    setIsFooterVisible(false);
     setTimeout(() => {
       startCamera();
     }, 100);
@@ -313,7 +323,6 @@ const Upload = () => {
               type="file"
               onChange={handleFileChange}
               disabled={loading}
-              capture="environment"
             />
 
             {/* Buttons Container - Responsive */}

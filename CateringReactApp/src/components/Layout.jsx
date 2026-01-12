@@ -6,6 +6,7 @@ import Footer from "./Footer";
 
 const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isFooterVisible, setIsFooterVisible] = useState(true);
 
   return (
     <div className="flex flex-col h-screen w-full bg-gray-50">
@@ -39,15 +40,15 @@ const Layout = () => {
         {/* Main Content - Scrollable with footer spacing */}
         <div className="flex-1 flex flex-col min-w-0 w-full overflow-y-auto">
           <main className="flex-1 w-full mx-auto py-4 md:py-6 px-3 md:px-4 max-w-7xl">
-            <Outlet />
+            <Outlet context={{ setIsFooterVisible }} />
           </main>
           {/* Footer Spacer - Prevents content from hiding under fixed footer */}
-          <div className="h-20 flex-shrink-0" />
+          {isFooterVisible && <div className="h-20 flex-shrink-0" />}
         </div>
       </div>
 
       {/* Footer - Fixed at bottom */}
-      <Footer />
+      {isFooterVisible && <Footer />}
     </div>
   );
 };

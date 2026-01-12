@@ -74,7 +74,7 @@ const Dashboard = () => {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Sticky Title */}
-      <div className="sticky top-0 bg-white z-10 pb-4 border-b border-gray-200 flex-shrink-0">
+      <div className="sticky top-0 bg-white z-10 p-4 rounded-lg shadow flex-shrink-0">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
           Dashboard
         </h1>

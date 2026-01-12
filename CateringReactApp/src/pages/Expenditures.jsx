@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "react-query";
+import { useOutletContext } from "react-router-dom";
 import {
   TrashIcon,
   PencilIcon,
@@ -114,6 +115,11 @@ const Expenditures = () => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState(null);
+  const { setIsFooterVisible } = useOutletContext() || { setIsFooterVisible: () => {} };
+
+  useEffect(() => {
+    return () => setIsFooterVisible(true);
+  }, [setIsFooterVisible]);
 
   const {
     data: expenses,
@@ -127,6 +133,7 @@ const Expenditures = () => {
   const handleEdit = (expense) => {
     setSelectedExpense(expense);
     setEditDialogOpen(true);
+    setIsFooterVisible(false);
   };
 
   const handleDelete = (expense) => {
@@ -151,6 +158,7 @@ const Expenditures = () => {
       await api.put(`/api/bills/${updatedExpense.id}`, updatedExpense);
       queryClient.invalidateQueries("expenses");
       setEditDialogOpen(false);
+      setIsFooterVisible(true);
       toast.success("Expense updated successfully");
     } catch (error) {
       toast.error("Error updating expense");
@@ -175,57 +183,53 @@ const Expenditures = () => {
   }
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Sticky Title */}
-      <div className="sticky top-0 bg-white z-10 pb-4 border-b border-gray-200">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-          Expenditures
-        </h1>
+    <>
+      <div className="bg-white p-4 rounded-lg shadow mb-6">
+        <h1 className="text-3xl font-bold text-gray-900">Expenditures</h1>
       </div>
-
-      {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="bg-white rounded-lg shadow overflow-hidden mt-4">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-gray-100 border-b border-gray-200 sticky top-0 z-10">
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 w-10"></th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
-                    Vendor
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
-                    Date
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
-                    Total Amount
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
-                    Payment Method
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {expenses?.map((expense) => (
-                  <ExpenseRow
-                    key={expense.id}
-                    expense={expense}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                  />
-                ))}
-              </tbody>
-            </table>
-          </div>
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-gray-100 border-b border-gray-200">
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 w-10"></th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
+                  Vendor
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
+                  Date
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
+                  Total Amount
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
+                  Payment Method
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {expenses?.map((expense) => (
+                <ExpenseRow
+                  key={expense.id}
+                  expense={expense}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                />
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
 
       <ExpenseEditDialog
         open={editDialogOpen}
-        onClose={() => setEditDialogOpen(false)}
+        onClose={() => {
+          setEditDialogOpen(false);
+          setIsFooterVisible(true);
+        }}
         expense={selectedExpense}
         onSave={handleSaveEdit}
       />
@@ -257,7 +261,7 @@ const Expenditures = () => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
