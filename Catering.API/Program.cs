@@ -1,22 +1,21 @@
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSingleton<MongoDbContext>();
-builder.Services.AddScoped<IBillRepository, BillRepository>();
-
+// Add services to the container.
 builder.Services.AddControllers();
+
+// Register application services
+builder.Services.AddApplicationServices();
+
+// Configure JWT authentication and authorization
+builder.Services.AddJwtAuthentication(builder.Configuration);
+
+// Configure Swagger
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGenWithAuth();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
-app.UseAuthorization();
-app.MapControllers();
+// Configure the HTTP request pipeline
+app.UseApplicationMiddleware(app.Environment);
 
 app.Run();

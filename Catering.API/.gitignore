@@ -24,6 +24,7 @@ appsettings.*.json
 # Keep ignoring the main settings file if it contains secrets or local overrides
 # (This line was already present in your file)
 appsettings.json
+appsettings.Development.json
 
 # NuGet packages folder - typically managed by NuGet itself, but good practice
 packages/

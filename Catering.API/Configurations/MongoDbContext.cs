@@ -11,4 +11,6 @@ public class MongoDbContext
     }
 
     public IMongoCollection<ScannedBill> Bills => _database.GetCollection<ScannedBill>("ScannedBills");
+    public IMongoCollection<User> Users => _database.GetCollection<User>("Users");
+
 }
