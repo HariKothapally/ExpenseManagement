@@ -103,6 +103,10 @@ export default function Login() {
               {isLoading ? "Signing in..." : "Sign In"}
             </button>
           </form>
+          <div className="mt-4 text-sm text-gray-600 flex flex-col items-center">
+            <span>Username: hello@gmail.com</span>
+            <span>Password: hellohari</span>
+          </div>
         </div>
       </div>
     </div>

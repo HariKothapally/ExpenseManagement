@@ -170,102 +170,87 @@ const Downloads = () => {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Sticky Title and Filter */}
-      <div className="sticky top-0 bg-white z-10 pb-4 border-b border-gray-200">
-        <h1 className="text-2xl md:text-3xl font-bold mb-4 text-gray-900">
+    <div>
+      <div className="bg-white p-4 rounded-lg shadow mb-6">
+        <h1 className="text-3xl font-bold text-gray-900">
           Download Expenses
         </h1>
-
-        <div className="bg-white rounded-lg shadow p-4 md:p-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Filter Type
-              </label>
-              <select
-                value={filterType}
-                onChange={handleFilterTypeChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="custom">Custom Date Range</option>
-                <option value="thisMonth">This Month</option>
-                <option value="lastMonth">Last Month</option>
-                <option value="thisYear">This Year</option>
-                <option value="lastYear">Last Year</option>
-              </select>
-            </div>
-
-            {filterType === "custom" && (
-              <>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Start Date
-                  </label>
-                  <input
-                    type="date"
-                    value={startDate ? startDate.format("YYYY-MM-DD") : ""}
-                    onChange={(e) =>
-                      setStartDate(
-                        e.target.value ? dayjs(e.target.value) : null,
-                      )
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    End Date
-                  </label>
-                  <input
-                    type="date"
-                    value={endDate ? endDate.format("YYYY-MM-DD") : ""}
-                    onChange={(e) =>
-                      setEndDate(e.target.value ? dayjs(e.target.value) : null)
-                    }
-                    min={startDate ? startDate.format("YYYY-MM-DD") : ""}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </>
-            )}
-
-            <div className="flex items-end">
-              <button
-                onClick={handleDownload}
-                disabled={
-                  loading ||
-                  fetchingData ||
-                  (filterType === "custom" && (!startDate || !endDate))
-                }
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium text-sm md:text-base"
-              >
-                {loading || fetchingData ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span className="hidden sm:inline">Downloading...</span>
-                    <span className="sm:hidden">Downloading</span>
-                  </>
-                ) : (
-                  <>
-                    <ArrowDownTrayIcon className="w-4 h-4 md:w-5 md:h-5" />
-                    <span className="hidden sm:inline">Download Excel</span>
-                    <span className="sm:hidden">Download</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
 
-      {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="mt-6 text-center text-gray-600">
-          <p>
-            Select your filters above and click "Download Excel" to export
-            expenses.
-          </p>
+      <div className="bg-white rounded-lg shadow p-6 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Filter Type
+            </label>
+            <select
+              value={filterType}
+              onChange={handleFilterTypeChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="custom">Custom Date Range</option>
+              <option value="thisMonth">This Month</option>
+              <option value="lastMonth">Last Month</option>
+              <option value="thisYear">This Year</option>
+              <option value="lastYear">Last Year</option>
+            </select>
+          </div>
+
+          {filterType === "custom" && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Start Date
+                </label>
+                <input
+                  type="date"
+                  value={startDate ? startDate.format("YYYY-MM-DD") : ""}
+                  onChange={(e) =>
+                    setStartDate(e.target.value ? dayjs(e.target.value) : null)
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  End Date
+                </label>
+                <input
+                  type="date"
+                  value={endDate ? endDate.format("YYYY-MM-DD") : ""}
+                  onChange={(e) =>
+                    setEndDate(e.target.value ? dayjs(e.target.value) : null)
+                  }
+                  min={startDate ? startDate.format("YYYY-MM-DD") : ""}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </>
+          )}
+
+          <div className="flex items-end">
+            <button
+              onClick={handleDownload}
+              disabled={
+                loading ||
+                fetchingData ||
+                (filterType === "custom" && (!startDate || !endDate))
+              }
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium"
+            >
+              {loading || fetchingData ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Downloading...
+                </>
+              ) : (
+                <>
+                  <ArrowDownTrayIcon className="w-5 h-5" />
+                  Download Excel
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>

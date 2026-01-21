@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { auth } from '../services/api';
 import { getToken, removeToken, setToken } from '../services/auth';
 import toast from 'react-hot-toast';
@@ -10,7 +10,6 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
-  const location = useLocation();
 
   useEffect(() => {
     const token = getToken();
@@ -25,8 +24,6 @@ export const AuthProvider = ({ children }) => {
         setToken(response.data.token);
         setIsAuthenticated(true);
         toast.success('Successfully logged in');
-        const from = location.state?.from?.pathname || '/dashboard';
-        navigate(from, { replace: true });
         return response;
       }
       throw new Error('Invalid response from server');
