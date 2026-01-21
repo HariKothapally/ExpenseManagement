@@ -3,8 +3,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 
-// Register application services
-builder.Services.AddApplicationServices();
+// Register application services with configuration
+builder.Services.AddApplicationServices(builder.Configuration);
 
 // Configure JWT authentication and authorization
 builder.Services.AddJwtAuthentication(builder.Configuration);
